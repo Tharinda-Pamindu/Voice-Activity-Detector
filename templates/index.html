@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Activity Detector — Smart Audio Splitter</title>
+    <meta name="description" content="Automatically detect and split speech segments from long audio files using AI-powered Voice Activity Detection.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="bg-gradient"></div>
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header glass-card">
+            <div class="header-content">
+                <div class="logo-group">
+                    <div class="logo-icon">
+                        <span class="material-icons-round">graphic_eq</span>
+                    </div>
+                    <div>
+                        <h1 class="app-title">Voice Activity Detector</h1>
+                        <p class="app-subtitle">AI-powered audio segmentation with Silero VAD</p>
+                    </div>
+                </div>
+                <div class="header-badge">
+                    <span class="material-icons-round">auto_awesome</span>
+                    <span>Powered by Silero VAD</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section id="upload-section" class="glass-card section-card">
+                <div class="section-header">
+                    <span class="material-icons-round section-icon">cloud_upload</span>
+                    <div>
+                        <h2>Upload Audio</h2>
+                        <p>Drag & drop or click to select your audio file</p>
+                    </div>
+                </div>
+
+                <div id="drop-zone" class="drop-zone">
+                    <div class="drop-zone-content">
+                        <div class="upload-icon-wrapper">
+                            <span class="material-icons-round upload-icon">audio_file</span>
+                            <div class="upload-ring"></div>
+                        </div>
+                        <p class="drop-text">Drop your audio file here</p>
+                        <p class="drop-subtext">or click to browse</p>
+                        <div class="format-chips">
+                            <span class="chip">WAV</span>
+                            <span class="chip">MP3</span>
+                            <span class="chip">OGG</span>
+                            <span class="chip">FLAC</span>
+                            <span class="chip">M4A</span>
+                            <span class="chip">OPUS</span>
+                        </div>
+                    </div>
+                    <input type="file" id="file-input" accept=".wav,.mp3,.ogg,.flac,.aac,.m4a,.wma,.opus,.webm" hidden>
+                </div>
+
+                <!-- File Info (shown after upload) -->
+                <div id="file-info" class="file-info hidden">
+                    <div class="file-info-card glass-inner">
+                        <span class="material-icons-round file-icon">music_note</span>
+                        <div class="file-details">
+                            <span id="file-name" class="file-name"></span>
+                            <span id="file-size" class="file-size"></span>
+                        </div>
+                        <button id="remove-file" class="icon-btn" title="Remove file">
+                            <span class="material-icons-round">close</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="glass-card section-card hidden">
+                <div class="section-header">
+                    <span class="material-icons-round section-icon">tune</span>
+                    <div>
+                        <h2>VAD Settings</h2>
+                        <p>Fine-tune the voice detection parameters</p>
+                    </div>
+                    <button id="toggle-settings" class="icon-btn" title="Toggle advanced settings">
+                        <span class="material-icons-round">expand_more</span>
+                    </button>
+                </div>
+
+                <div id="settings-body" class="settings-body">
+                    <div class="settings-grid">
+                        <div class="setting-item glass-inner">
+                            <label>
+                                <span class="setting-label">Detection Sensitivity</span>
+                                <span class="setting-hint">Higher = stricter speech detection</span>
+                            </label>
+                            <div class="slider-group">
+                                <input type="range" id="threshold" min="0.1" max="0.95" step="0.05" value="0.5" class="material-slider">
+                                <span id="threshold-val" class="slider-value">0.50</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item glass-inner">
+                            <label>
+                                <span class="setting-label">Min Speech Duration</span>
+                                <span class="setting-hint">Ignore speech shorter than this (ms)</span>
+                            </label>
+                            <div class="slider-group">
+                                <input type="range" id="min-speech" min="100" max="2000" step="50" value="250" class="material-slider">
+                                <span id="min-speech-val" class="slider-value">250ms</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item glass-inner">
+                            <label>
+                                <span class="setting-label">Min Silence Duration</span>
+                                <span class="setting-hint">Min silence gap to split segments (ms)</span>
+                            </label>
+                            <div class="slider-group">
+                                <input type="range" id="min-silence" min="100" max="3000" step="50" value="300" class="material-slider">
+                                <span id="min-silence-val" class="slider-value">300ms</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item glass-inner">
+                            <label>
+                                <span class="setting-label">Max Segment Length</span>
+                                <span class="setting-hint">Split segments longer than this (seconds)</span>
+                            </label>
+                            <div class="slider-group">
+                                <input type="range" id="max-segment" min="3" max="30" step="1" value="10" class="material-slider">
+                                <span id="max-segment-val" class="slider-value">10s</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item glass-inner">
+                            <label>
+                                <span class="setting-label">Padding</span>
+                                <span class="setting-hint">Extra audio around each segment (ms)</span>
+                            </label>
+                            <div class="slider-group">
+                                <input type="range" id="padding" min="0" max="500" step="25" value="200" class="material-slider">
+                                <span id="padding-val" class="slider-value">200ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-actions">
+                    <button id="analyze-btn" class="material-btn primary-btn" disabled>
+                        <span class="material-icons-round">psychology</span>
+                        <span>Analyze Audio</span>
+                        <div class="btn-ripple"></div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Progress Section -->
+            <section id="progress-section" class="glass-card section-card hidden">
+                <div class="progress-content">
+                    <div class="progress-spinner">
+                        <svg viewBox="0 0 50 50">
+                            <circle cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 id="progress-title">Analyzing audio...</h3>
+                        <p id="progress-subtitle">Running Voice Activity Detection</p>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="glass-card section-card hidden">
+                <div class="section-header">
+                    <span class="material-icons-round section-icon">timeline</span>
+                    <div>
+                        <h2>Detection Results</h2>
+                        <p id="results-summary"></p>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card glass-inner">
+                        <span class="material-icons-round stat-icon">timer</span>
+                        <div class="stat-info">
+                            <span id="stat-duration" class="stat-value">--</span>
+                            <span class="stat-label">Total Duration</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-inner">
+                        <span class="material-icons-round stat-icon">segment</span>
+                        <div class="stat-info">
+                            <span id="stat-segments" class="stat-value">--</span>
+                            <span class="stat-label">Speech Segments</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-inner">
+                        <span class="material-icons-round stat-icon">record_voice_over</span>
+                        <div class="stat-info">
+                            <span id="stat-speech" class="stat-value">--</span>
+                            <span class="stat-label">Speech Time</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-inner">
+                        <span class="material-icons-round stat-icon">volume_off</span>
+                        <div class="stat-info">
+                            <span id="stat-silence" class="stat-value">--</span>
+                            <span class="stat-label">Silence Removed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Visualization -->
+                <div class="timeline-container glass-inner">
+                    <div class="timeline-header">
+                        <span class="material-icons-round">view_timeline</span>
+                        <span>Audio Timeline</span>
+                    </div>
+                    <div id="timeline" class="timeline">
+                        <canvas id="timeline-canvas"></canvas>
+                    </div>
+                    <div class="timeline-labels">
+                        <span id="timeline-start">0:00</span>
+                        <span id="timeline-end">0:00</span>
+                    </div>
+                </div>
+
+                <!-- Segments List -->
+                <div class="segments-header">
+                    <h3>Segments</h3>
+                    <div class="segments-actions">
+                        <button id="select-all-btn" class="material-btn text-btn">
+                            <span class="material-icons-round">select_all</span>
+                            <span>Select All</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="segments-list" class="segments-list"></div>
+
+                <!-- Download Actions -->
+                <div class="section-actions">
+                    <button id="download-btn" class="material-btn primary-btn">
+                        <span class="material-icons-round">download</span>
+                        <span>Download Selected Segments</span>
+                        <div class="btn-ripple"></div>
+                    </button>
+                    <button id="restart-btn" class="material-btn outline-btn">
+                        <span class="material-icons-round">restart_alt</span>
+                        <span>New File</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Snackbar -->
+        <div id="snackbar" class="snackbar">
+            <span class="material-icons-round snackbar-icon"></span>
+            <span id="snackbar-message"></span>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
