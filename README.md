@@ -58,7 +58,11 @@ All through a beautiful **Liquid Glass UI** with Material Design components — 
 - **Python 3.10+** — [Download Python](https://python.org/downloads)
 - **FFmpeg** _(optional, for MP3/AAC support)_ — [Download FFmpeg](https://ffmpeg.org/download.html)
 
-### Option A: Automated Setup (Windows)
+### Option A: One-Click Launch (Windows)
+
+After initial setup, just **double-click `run.cmd`** — it activates the virtual environment, starts the server, and opens your browser automatically.
+
+### Option B: Automated Setup (Windows — First Time)
 
 ```bash
 git clone https://github.com/Tharinda-Pamindu/Voice-Activity-Detector.git
@@ -66,7 +70,9 @@ cd Voice-Activity-Detector
 setup.bat
 ```
 
-### Option B: Manual Setup
+Then double-click **`run.cmd`** to launch.
+
+### Option C: Manual Setup
 
 ```bash
 # Clone the repository
@@ -156,8 +162,9 @@ pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 Voice-Activity-Detector/
 ├── app.py                 # Flask backend + VAD processing engine
+├── run.cmd                # One-click launcher (activates venv + opens browser)
+├── setup.bat              # Windows first-time setup script
 ├── requirements.txt       # Python dependencies
-├── setup.bat              # Windows automated setup script
 ├── templates/
 │   └── index.html         # Main HTML page (Liquid Glass UI)
 ├── static/
