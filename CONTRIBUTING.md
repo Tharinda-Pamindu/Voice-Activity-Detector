@@ -56,7 +56,7 @@ Ready to code? Follow the steps below.
 2. **Clone** your fork:
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/Voice-Activity-Detector.git
+   git clone https://github.com/Tharinda-Pamindu/Voice-Activity-Detector.git
    cd Voice-Activity-Detector
    ```
 
